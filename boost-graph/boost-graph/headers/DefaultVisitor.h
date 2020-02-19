@@ -6,7 +6,7 @@ public:
 	void discoverVertex(V, const G&){}
 
 	template<typename E, typename G>
-	void discoverEdge(E, const G&){ }
+	void treeEdge(E, const G&){ }
 
 	template<typename E, typename G>
 	void backEdge(E, const G&) {}

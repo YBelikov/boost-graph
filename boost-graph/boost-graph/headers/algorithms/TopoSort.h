@@ -27,7 +27,7 @@ using boost::default_color_type;
 
 
 
-using graph = adjacency_list < boost::listS, boost::listS, boost::directedS,
+using graph = adjacency_list <boost::listS, boost::vecS, boost::directedS,
 	boost::property<boost::vertex_name_t, std::string, boost::property<boost::vertex_distance_t, float, boost::property<boost::vertex_color_t, default_color_type,
 	boost::property<boost::vertex_compile_cost_t, float>>>>, boost::property<boost::edge_weight_t, float>>;
 
@@ -46,7 +46,8 @@ void printGraph(const Graph& g);
 template<typename Graph>
 Graph fillGraph(const std::string&);
 
-vector<std::string> getFileNames(const graph&);
+template<typename Graph>
+std::vector<std::string> getFileNames(const Graph&, const std::string&);
 
 
 template<typename Graph, typename OutputIterator, typename ColorMap>
@@ -70,6 +71,14 @@ Graph fillGraph(const std::string& graphFile) {
 	return g;
 }
 
+
+template<typename Graph>
+vector<std::string> getFileNames(const Graph& g, const std::string& nameFile) {
+	
+
+}
+
+
 template<typename Graph>
 void printGraph(const Graph& g) {
 	typename boost::graph_traits<Graph>::edge_iterator edgesBegin, edgesEnd;
@@ -87,38 +96,40 @@ void topoSort(const Graph& g, OutputIterator topoOrder, ColorMap color) {
 template<typename Graph, typename Visitor, typename ColorMap>
 void genericDFS(const Graph& g, Visitor vis, ColorMap color) {
 	using Color = boost::color_traits<typename boost::property_traits<ColorMap>::value_type>;
-	typename boost::graph_traits<Graph>::vertex_descriptor vBegin, vEnd;
-	for (tie(vBegin, vEnd) = vertices(g); vBegin != vEnd; ++vBegin) {
+	typename boost::graph_traits<Graph>::vertex_iterator vBegin, vEnd;
+	for (boost::tie(vBegin, vEnd) = vertices(g); vBegin != vEnd; ++vBegin) {
 		color[*vBegin] = Color::white();
-		for (tie(vBegin, vEnd) = vertices(g); vBegin != vEnd; ++vBegin) {
-			if (color[*vBegin] == Color::white()) {
-				dfs(g, *vBegin, vis, color);
-			}
+	}
+	for (boost::tie(vBegin, vEnd) = vertices(g); vBegin != vEnd; ++vBegin) {
+		if (color[*vBegin] == Color::white()) {
+			dfs(g, *vBegin, vis, color);
 		}
 	}
+
 }
 
 
 template<typename Graph, typename Visitor, typename ColorMap>
 void dfs(const Graph& g, typename boost::graph_traits<Graph>::vertex_descriptor vertex, Visitor vis, ColorMap color) {
 	using colorType = typename boost::property_traits<ColorMap>::value_type;
-	using colorTraits = typename boost::color_traits<colorType>::value_type;
+	using colorTraits = boost::color_traits<colorType>;
 	color[vertex] = colorTraits::gray();
 	vis.discoverVertex(vertex, g);
-	typename graph_traits<Graph>::edge_iterator eBegin, eEnd;
-	if (color[*eBegin] == colorTraits::white()) {
-		vis.treeEdge(*eBegin, g);
-		dfs(g, boost::target(*eBegin, g), vis, color);
-	}
-	else if (color[*eBegin] == colorTraits::gray()) {
-		vis.backEdge(*eBegin, g);
-		dfs(g, boost::target(*eBegin, g), vis, color);
-	}
-	else {
-		vis.towardOrCrossEdge(*eBegin, g);
+	typename boost::graph_traits<Graph>::out_edge_iterator eBegin, eEnd;
+	for (boost::tie(eBegin, eEnd) = boost::out_edges(vertex, g); eBegin != eEnd; ++eBegin) {
+		if (color[boost::target(*eBegin, g)] == colorTraits::white()) {
+			vis.treeEdge(*eBegin, g);
+			dfs(g, boost::target(*eBegin, g), vis, color);
+		}
+		else if (color[target(*eBegin, g)] == colorTraits::gray()) {
+			vis.backEdge(*eBegin, g);
+		}
+		else {
+			vis.forwardOrCrossEdge(*eBegin, g);
+		}
 	}
 	color[vertex] = colorTraits::black();
-	vis.finishVertex(vertex, g);
+	vis.finishVertex(vertex, g);	
 }
 
 namespace std {

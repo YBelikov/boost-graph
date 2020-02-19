@@ -10,7 +10,7 @@ public:
 
 	template<typename Graph> 
 	void finishVertex(typename boost::graph_traits<Graph>::vertex_descriptor u, const Graph&) {
-		*--topoOrder = u;
+		*topoOrder++ = u;
 	}
 private:
 	OutputIterator& topoOrder;
