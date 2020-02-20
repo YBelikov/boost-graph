@@ -5,7 +5,7 @@ int main()
 {
 	
 	std::string graphFile{ "./resources/graph.txt" };
-
+	std::string graphWithCycleFile{ "./resources/graphWithCycle.txt" };
 	std::string namesFile{ "./resources/names.txt" };
 	std::string costsFile{ "./resources/costs.txt" };
 
@@ -24,6 +24,7 @@ int main()
 
 	std::ifstream verticesNames(namesFile.c_str());
 	std::ifstream compileCosts(costsFile.c_str());
+
 	typename boost::graph_traits<graph>::vertex_iterator vBegin, vEnd;
 	for (boost::tie(vBegin, vEnd) = vertices(g); vBegin != vEnd; ++vBegin) {
 		verticesNames >> name_map[*vBegin];
@@ -50,7 +51,11 @@ int main()
 
 			}
 	}
-
+	
+	if (hasCycle(g, color_map)) {
+		std::cout << "Cycle in graph detected\n";
+		return 0;
+	}
 	std::vector<vertex_t> topoOrder(boost::num_vertices(g));
 	topoSort(g, topoOrder.rbegin(), color_map);
 	std::vector<vertex_t>::iterator vIterator;
