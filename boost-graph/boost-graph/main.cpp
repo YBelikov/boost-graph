@@ -29,15 +29,41 @@ int main()
 		verticesNames >> name_map[*vBegin];
 		compileCosts >> compile_cost_map[*vBegin];
 	}
-	std::vector<vertex_t> topoOrder( boost::num_vertices(g));
-	topoSort(g, topoOrder.rbegin(), color_map);
-
-	for (int i = 0; i < boost::num_vertices(g); ++i) {
-	 	std::cout << names[topoOrder[i]] << '\n';
+	typename boost::graph_traits<graph>::vertex_iterator it, itEnd;
+	typename boost::graph_traits<graph>::adjacency_iterator aIterator, aIteratorEnd;
+	for (boost::tie(it, itEnd) = vertices(g); it != itEnd; ++it) {
+		color_map[*it] = boost::white_color;
 	}
-	
-	boost::graph_property_iter_range<graph, boost::vertex_compile_cost_t>::iterator it, itEnd;
-	tie(it, itEnd) = get_property_iter_range(g, boost::vertex_compile_cost);
-	std::cout << "total time: " << std::accumulate(it, itEnd, 0.0) <<'\n';
+	for (boost::tie(it, itEnd) = vertices(g); it != itEnd; ++it) {
+		for (boost::tie(aIterator, aIteratorEnd) = boost::adjacent_vertices(*it, g); aIterator != aIteratorEnd; ++aIterator) {
+			color_map[*aIterator] = boost::black_color;
+		}
+	}
+
+
+	for (boost::tie(it, itEnd) = vertices(g); it != itEnd; ++it) {
+			if (color_map[*it] == boost::black_color) {
+				distance_map[*it] = compile_cost_map[*it];
+			}
+			else {
+				distance_map[*it] = compile_cost_map[*it];
+
+			}
+	}
+
+	std::vector<vertex_t> topoOrder(boost::num_vertices(g));
+	topoSort(g, topoOrder.rbegin(), color_map);
+	std::vector<vertex_t>::iterator vIterator;
+	for (vIterator = topoOrder.begin(); vIterator != topoOrder.end(); ++vIterator) {
+		vertex_t u = *vIterator;
+		for (boost::tie(aIterator, aIteratorEnd) = adjacent_vertices(u, g); aIterator != aIteratorEnd; ++aIterator) {
+			if (distance_map[*aIterator] < distance_map[u] + compile_cost_map[*aIterator]) {
+				distance_map[*aIterator] = distance_map[u] + compile_cost_map[*aIterator];
+			}
+		}
+	}
+	typename boost::graph_property_iter_range<graph, boost::vertex_distance_t>::iterator beg, end;
+	tie(beg, end) = boost::get_property_iter_range(g, boost::vertex_distance);
+	std::cout << "Max parallel compillation time: " << *std::max_element(beg, end) <<'\n';
 	return 0;
 }

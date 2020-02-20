@@ -27,7 +27,7 @@ using boost::default_color_type;
 
 
 
-using graph = adjacency_list <boost::listS, boost::vecS, boost::directedS,
+using graph = adjacency_list <boost::vecS, boost::vecS, boost::directedS,
 	boost::property<boost::vertex_name_t, std::string, boost::property<boost::vertex_distance_t, float, boost::property<boost::vertex_color_t, default_color_type,
 	boost::property<boost::vertex_compile_cost_t, float>>>>, boost::property<boost::edge_weight_t, float>>;
 
