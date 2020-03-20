@@ -1,10 +1,49 @@
+#define _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+
 #include "./headers/algorithms/TopoSort.h"
 #include "./headers/algorithms/CycleDetection.h"
+#include <boost/graph/edge_list.hpp>
+#include <boost/graph/graph_utility.hpp>
+#include <boost/graph/adjacency_iterator.hpp>
+#include <array>
+#include <algorithm>
+#include "./headers/algorithms/BelmannFord.h"
+
+enum {A, B, C, D, E, F, G, H};
+using std::array;
+using std::pair;
+using Edge = pair<int, int>; 
+const int numberOfEdges = 11;
+const int numberOfVertices = 8;
 
 int main()
 {
-	
-	std::string graphFile{ "./resources/graph.txt" };
+	array<Edge, numberOfEdges> edges = { Edge(A, B), Edge(A, C), Edge(B, D), Edge(B, E), Edge(C, F),
+		Edge(C, E), Edge(D, H), Edge(D, E), Edge(E, H), Edge(F, G), Edge(G, H) };
+	using Graph = boost::edge_list<array<Edge, numberOfEdges>::iterator>;
+	Graph graph(edges.begin(), edges.end());
+
+
+	array<float, numberOfEdges> weights = { 5.0, 1.0, 1.3, 3.0, 2.0, 10.0, 6.3, 0.4, 1.3, 1.2, 0.5 };
+	auto weightMap = boost::make_iterator_property_map(weights.begin(), get(boost::edge_index, graph), weights[0]);
+	array<float, numberOfVertices> distances;
+	distances.assign(std::numeric_limits<float>::max());
+	char names[] = "ABCDEFGH";
+	distances[A] = 0;
+	array<int, numberOfVertices> parents;
+	for (int i{}; i < numberOfVertices; ++i) {
+		parents[i] = i;
+	}
+	bool result = belmannFord(graph, numberOfVertices, &weights[0], &distances[0], &parents[0]);
+	if (result) {
+		for (int i = 0; i < numberOfVertices; ++i) {
+			std::cout << names[i] << ' ' << distances[i] << ' ' << names[parents[i]] << '\n';
+		}
+	}
+	else {
+		std::cout << "Negative cicle detected\n";
+	}
+	/*std::string graphFile{ "./resources/graph.txt" };
 	std::string graphWithCycleFile{ "./resources/graphWithCycle.txt" };
 	std::string namesFile{ "./resources/names.txt" };
 	std::string costsFile{ "./resources/costs.txt" };
@@ -69,6 +108,7 @@ int main()
 	}
 	typename boost::graph_property_iter_range<graph, boost::vertex_distance_t>::iterator beg, end;
 	tie(beg, end) = boost::get_property_iter_range(g, boost::vertex_distance);
-	std::cout << "Max parallel compillation time: " << *std::max_element(beg, end) <<'\n';
+	std::cout << "Max parallel compillation time: " << *std::max_element(beg, end) <<'\n';*/
 	return 0;
 }
+

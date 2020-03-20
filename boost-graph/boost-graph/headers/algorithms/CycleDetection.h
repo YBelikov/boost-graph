@@ -8,4 +8,4 @@ bool hasCycle(const Graph& g, ColorMap map) {
 	CycleDetectionVisitor<Graph> vis(hasCycle);
 	genericDFS(g, vis, map);
 	return vis.doesGraphHasCycle();
-}
+}	
