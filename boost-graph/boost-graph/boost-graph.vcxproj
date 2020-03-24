@@ -127,12 +127,16 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BackEdgeRecorder.h" />
     <ClInclude Include="BelmannFord.h" />
+    <ClInclude Include="CyclesRecording.h" />
+    <ClInclude Include="Dijkstra.h" />
     <ClInclude Include="headers\algorithms\CycleDetection.h" />
     <ClInclude Include="headers\algorithms\TopoSort.h" />
     <ClInclude Include="headers\CycleDetectionVisitor.h" />
     <ClInclude Include="headers\DefaultVisitor.h" />
     <ClInclude Include="headers\DFSVisitor.h" />
+    <ClInclude Include="Kruskal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
