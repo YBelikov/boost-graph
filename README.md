@@ -1,2 +1,2 @@
 # boost-graph
-This repo has been created as place where I will put some of my works with boost.graph library during learning it features
+This repo has been created as the place where I will put some boost.graph related source code while I learn this library's abilities
